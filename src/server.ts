@@ -1,4 +1,5 @@
 import fastify from "fastify";
+import { request } from "http";
 
 const server = fastify({logger: true});
 
@@ -22,6 +23,20 @@ server.get("/teams", async (request, response) => {
 server.get("/drivers", async(request, response)=>{
     response.type("applicaiton/json").code(200);
     return {drivers}
+})
+
+interface DriverParams {
+    id: string;
+}
+
+server.get<{Params: DriverParams}>("/drivers/:id", async (request, response) => {
+    const id = parseInt(request.params.id);
+    const driver = drivers.find((driver) => driver.id === id);
+
+    if(!driver){
+        response.type("application/json").code(404)
+        return {message: "Driver not found"}
+    }
 })
 
 server.listen({port: 3333}, ()=>{
